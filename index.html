@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Diary Card</title>
+    <style>
+        body {
+            /* background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* min-height: 100px; */
+            margin: 0;
+        }
+
+        
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        canvas {
+            display: block;
+        }
+        #explosion {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        /* body1 {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        } */
+
+        video {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            /* height: 593px; */
+            width: fit-content;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        /* h1 {
+            font-family: 'Arial', sans-serif;
+            font-size: 3em;
+            color: #fff;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 1; /* Make sure the text is above the video */
+         */
+
+        #container {
+            display: flex;
+            justify-content: center;
+            background-image: url(Grey\ Animated\ Happy\ Birthday\ Instagram\ Story.png);
+            align-items: center;
+            min-height: 100px; 
+            height: 593px;
+            /* height: auto; */
+            /* width: 450px; */
+            margin: 0;
+         }
+
+        .book {
+            position: relative;
+            border-radius: 10px;
+            width: 400px;
+            height: 450px;
+            align-items: center;
+            background-size: 97%;
+            box-shadow: 1px 1px 12px #eee;
+            -webkit-box-shadow: 1px 1px 12px #000;
+            background-image: url(Grey\ Animated\ Happy\ Birthday\ Instagram\ Story.png);
+            object-fit: cover;
+            background-size: cover;
+            background-position: center;
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+            -ms-transform-style: preserve-3d;
+            transform: preserve-3d;
+            perspective: 2000px;
+            -webkit-perspective: 2000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; 
+            margin-top: 75px;
+        }
+
+        .cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #4158D0;
+            background-image: url(front.jpg);
+            
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.5s;
+            transform-origin: 0;
+            box-shadow: 1px 1px 12px #000;
+        }
+
+        .book:hover .cover {
+            transform: rotateY(-15deg);
+            -webkit-transform: rotateY(-85deg);
+            -ms-transform: rotateY(-85deg);
+            transform: rotateY(-85deg); /* Corrected the values for rotateY */
+        }
+        
+    </style>
+</head>
+<body>
+    <canvas id="explosion"></canvas>
+
+    <script>
+        var canvas = document.getElementById('explosion');
+        var ctx = canvas.getContext('2d');
+        var w, h;
+        var bursts = [];
+        var numBursts = 5; // Number of bursts
+        var numParticles = 100; // Number of particles per burst
+
+        function setCanvasSize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+
+        setCanvasSize();
+
+        window.addEventListener('resize', function () {
+            setCanvasSize();
+            init();
+        });
+
+        function drawCircle(x, y, r, fill) {
+            ctx.fillStyle = fill;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function randomColor() {
+            var r = Math.floor(Math.random() * 256);
+            var g = Math.floor(Math.random() * 256);
+            var b = Math.floor(Math.random() * 256);
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+
+        function createParticle(x, y, dx, dy, r, fill) {
+            this.x = x;
+            this.y = y;
+            this.dx = dx;
+            this.dy = dy;
+            this.r = r;
+            this.fill = fill;
+
+            this.update = function () {
+                this.x += this.dx;
+                this.y += this.dy;
+
+                if (this.x + this.r > w || this.x - this.r < 0) {
+                    this.dx = -this.dx;
+                }
+
+                if (this.y + this.r > h || this.y - this.r < 0) {
+                    this.dy = -this.dy;
+                }
+
+                drawCircle(this.x, this.y, this.r, this.fill);
+            };
+        }
+
+        function init() {
+            bursts = [];
+
+            for (var j = 0; j < numBursts; j++) {
+                var particles = [];
+                for (var i = 0; i < numParticles; i++) {
+                    var x = w / 2;
+                    var y = h / 2;
+                    var dx = Math.random() * 4 - 2;
+                    var dy = Math.random() * 4 - 2;
+                    var r = Math.random() * 3 + 1;
+                    var fill = randomColor();
+                    particles.push(new createParticle(x, y, dx, dy, r, fill));
+                }
+                bursts.push(particles);
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, w, h);
+
+            for (var j = 0; j < numBursts; j++) {
+                for (var i = 0; i < numParticles; i++) {
+                    bursts[j][i].update();
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+    </script>
+    <video autoplay loop>
+        <source src="video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div id="container">
+        <div class="book">
+            <!-- <p>Text Here</p> -->
+        
+            <div class="cover">
+                <!-- <p>Text Here</p> -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
